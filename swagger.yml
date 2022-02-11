@@ -1,0 +1,195 @@
+openapi: 3.0.1
+info:
+  title: Coffee Shack API
+  description: Coffee Shack API
+  version: 1.0.0
+servers:
+- url: coffee.platform.services.xxx.local/v1.0
+paths:
+  /order:
+    post:
+      summary: 'Request an order'
+      description: 'Placing an order'
+      responses:
+        501:
+          description: Not implemented
+          content: {}
+  /order/{orderId}:
+    get:
+      summary: Query an order
+      description: Querying an order
+      parameters: 
+        - name: orderId
+          in: path
+          description: Id of an order
+          required: true
+          schema:
+            pattern: ^[a-f0-9]{12}1[a-f0-9]{3}[89ab][a-f0-9]{15}$
+            type: string
+      responses:
+        501:
+          description: Not implemented
+          content: {}
+  /product:
+    post:
+      tags:
+        - Search
+      summary: Product Enquiry
+      description: Retrieve a list of mandates based on search criteria
+      responses:
+        501:
+          description: Not implemented
+          content: {}
+  /statement:
+    post:
+      summary: 'Customer statement'
+      description: API will provide details for a customer statements
+      responses:
+        200:
+          description: Details for Mandate on mandateIdentification is provided
+          content:
+            application/json:
+              schema:
+                $ref: ''
+  /testing/order:
+    post:
+      tags:
+      - Test
+      summary: 'Test endpoint to trigger Order Flow (Placed, Dispatched)'
+      description: 'Test endpoint to trigger a business flow'
+      requestBody:
+        description: Loyalty Reward Dispatched
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        501:
+          description: Not implemented
+          content: {}
+  /testing/reward:
+    post:
+      tags:
+      - Test
+      summary: 'Test endpoint to trigger Loyalty Reward Dispatched flow'
+      description: 'Test endpoint to trigger a business flow'
+      requestBody:
+        description: Loyalty Reward Dispatched Message
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reward'
+              description: Reward messagge
+            examples:
+              Reward Dispatched:
+                value:
+                  {
+                    "customer_identifier": "COFFEEAU4BXXX",
+                    "event_code": "Reward_Dispatched",
+                    "status": "Dispatched",
+                    "quantity": "1"
+                  }
+        required: true
+      responses:
+        501:
+          description: Not implemented
+          content: {}
+        "201":
+          description: Message received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Created"                      
+        "400":
+          description: Bad Request 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error      
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "413":
+          description: Payload Too Large   
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden  
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Reward:
+      type: object
+      properties:
+        CustomerIdentifier:
+          type: integer
+          format: int64
+        EventCode:
+          type: string
+        Status:
+          type: string
+          enum:
+          - disptached
+        quantity:
+          type: integer
+          format: int32
+    Order:
+      type: object
+      properties:
+        CustomerIdentifier:
+          type: integer
+          format: int64
+        EventCode:
+          type: string
+        Status:
+          type: string
+          enum:
+          - placed
+          - disptached
+        quantity:
+          type: integer
+          format: int32
+    ErrorResponse:
+      required:
+        - error
+      type: object
+      properties:
+        error:
+          required:
+            - statusCode
+            - title
+          type: object
+          properties:
+            title:
+              type: string
+              description: further information about the error
+              example: further information about the error
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  errorDetail:
+                    type: string
+         
